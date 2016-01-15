@@ -1,0 +1,174 @@
+<ion-view view-title="{{$root.i18.category.page_title}}" align-title="left">
+	<script type="text/ng-template" id="/edit.temp.html">
+		<form name="categoryForm" id="categoryForm" class="list md-inline-form md-padding" layout="column" ng-cloak novalidate>
+      <h4 class="positive">{{category.ID != null ? $root.i18.category.dialog_edit_title : $root.i18.category.dialog_add_title}}</h4>
+      <md-divider></md-divider>
+      <div class="option-ico" ng-if="category.parentName" style="margin-top: 10px;">
+        <div class="ico pull-left" ng-style="{'background-position': category.parentIcon}"></div>
+        {{category.parentName}}
+			</div>
+			<div ng-style="{'padding-left': category.parentName ? '36px' : '0px'}">
+				<md-input-container class="md-block bg-image24">
+					<div pick-icon ng-model36="category.icon" ng-model24="category.sicon"></div>
+	        <label>{{$root.i18.category.label_name}}</label>		        
+	        <input type="text" required name="name" select-on-click ng-model="category.name" autocomplete="off">
+	        <div ng-messages="categoryForm.name.$error" role="alert">
+            <div ng-message="required" >{{$root.i18.category.error_name}}</div>
+        	</div>
+	  		</md-input-container>
+	  		<md-input-container class="md-block">	        
+	        <label>{{$root.i18.category.label_oder}}</label>
+	        <input type="number" required name="oder" min="1" select-on-click ng-model="category.oder" autocomplete="off">
+	        <div ng-messages="categoryForm.oder.$error" role="alert">
+            <div ng-message="required" >{{$root.i18.category.error_oder}}</div>
+            <div ng-message="min" >{{$root.i18.category.error_oder_min}}</div>
+        	</div>
+				</md-input-container>
+  		</div>
+    	<md-button type="submit" on-tap="save()" ng-disabled="walletForm.$invalid" class="md-raised md-primary">{{$root.i18.common.button_save}}</md-button>
+    </form>
+	</script>	
+	<ion-content ng-class="{expanded:isExpanded}" class="animate-fade-slide-in" ng-init="loadData()">
+		<md-tabs md-dynamic-height md-align-tabs="top" md-stretch-tabs class="md-accent">
+	      <md-tab label="{{$root.i18.category.itab_spending}}" md-on-select="tabFocus(0)">
+	        <md-tab-body>		        
+					<div class="list">
+						<div ng-repeat="item in spendingTypes" class="item no-item" repeat-finished="finishLoadRecently(0);">
+							<div class="row">
+								<div class="col col-80">
+									<div class="ico pull-left" ng-style="{'background-position': item.icon}"></div>
+									<strong style="position: relative; top: 8px;">{{item.name}}</strong>
+								</div>
+								<div class="col col-20">
+									<div class="col col-10 sm-fab lock-size" layout="row" layout-align="center center">
+										<md-fab-speed-dial style="margin-right: -12px; margin-top: -10px;" md-direction="left" ng-class="md-fling" class="sm-fab md-fab-top-right-static md-hover-full">
+											<md-fab-trigger>
+													<md-button aria-label="menu" class="md-fab md-warn">
+				            				<ng-md-icon icon="menu" size="24" style="fill: #ffffff" />
+						          		</md-button>
+							        </md-fab-trigger>
+							        <md-fab-actions>
+							          	<md-button aria-label="Edit" class="md-fab md-raised md-mini" on-tap="edit($event, item)">
+							            	<ng-md-icon icon="edit" size="18" />
+							          	</md-button>
+						        	</md-fab-actions>
+						        	<md-fab-actions>
+							          	<md-button aria-label="Delete" class="md-fab md-raised md-mini" on-tap="delete($event, item)">
+							            	<ng-md-icon icon="delete" size="18" />
+							          	</md-button>
+						        	</md-fab-actions>
+						        	<md-fab-actions>
+							          	<md-button aria-label="Add" class="md-fab md-raised md-mini" on-tap="add($event, item)">
+							            	<ng-md-icon icon="add" size="18" />
+							          	</md-button>
+						        	</md-fab-actions>
+										</md-fab-speed-dial>
+									</div>
+								</div>
+							</div>
+							<div class="list" ng-if="item.inner" style="margin-left: 20px">
+								<div class="row" ng-repeat="item0 in item.inner" repeat-finished="finishLoadRecently(1);">
+									<div class="col col-80">
+										<div class="ico pull-left" ng-style="{'background-position': item0.icon}"></div>
+										<strong style="position: relative; top: 8px;">{{item0.name}}</strong>
+									</div>
+									<div class="col col-20">
+										<div class="col col-10 sm-fab lock-size" layout="row" layout-align="center center">
+											<md-fab-speed-dial style="margin-right: -12px; margin-top: -10px;" md-direction="left" ng-class="md-fling" class="sm-fab md-fab-top-right-static md-hover-full">
+											<md-fab-trigger>
+												<md-button aria-label="menu" class="md-fab md-warn">
+						            				<ng-md-icon icon="menu" size="24" style="fill: #ffffff" />
+								          		</md-button>
+									        </md-fab-trigger>
+									        <md-fab-actions>
+									          	<md-button aria-label="Edit" class="md-fab md-raised md-mini" on-tap="edit($event, item0)">
+									            	<ng-md-icon icon="edit" size="18" />
+									          	</md-button>
+								        	</md-fab-actions>
+								        	<md-fab-actions>
+									          	<md-button aria-label="Delete" class="md-fab md-raised md-mini" on-tap="delete($event, item0)">
+									            	<ng-md-icon icon="delete" size="18" />
+									          	</md-button>
+								        	</md-fab-actions>
+											</md-fab-speed-dial>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>				
+					</div>
+	    		</md-tab-body>
+	      </md-tab>	 
+	      <md-tab label="{{$root.i18.category.itab_earning}}" md-on-select="tabFocus(1)">
+	        <md-tab-body>
+				<div class="list">
+					<div ng-repeat="item in earningTypes" class="item no-item" repeat-finished="loadEffect()">
+						<div class="row">
+							<div class="col col-80">
+								<div class="ico pull-left" ng-style="{'background-position': item.icon}"></div>
+								<strong style="position: relative; top: 8px;">{{item.name}}</strong>
+							</div>
+							<div class="col col-20">
+								<div class="col col-10 sm-fab lock-size" layout="row" layout-align="center center">
+									<md-fab-speed-dial style="margin-right: -12px; margin-top: -10px;" md-direction="left" ng-class="md-fling" class="sm-fab md-fab-top-right-static md-hover-full">
+										<md-fab-trigger>
+												<md-button aria-label="menu" class="md-fab md-warn">
+			            				<ng-md-icon icon="menu" size="24" style="fill: #ffffff" />
+					          		</md-button>
+						        </md-fab-trigger>
+						        <md-fab-actions>
+						          	<md-button aria-label="Edit" class="md-fab md-raised md-mini" on-tap="edit($event, item)">
+						            	<ng-md-icon icon="edit" size="18" />
+						          	</md-button>
+					        	</md-fab-actions>
+					        	<md-fab-actions>
+						          	<md-button aria-label="Delete" class="md-fab md-raised md-mini" on-tap="delete($event, item)">
+						            	<ng-md-icon icon="delete" size="18" />
+						          	</md-button>
+					        	</md-fab-actions>
+					        	<md-fab-actions>
+						          	<md-button aria-label="Add" class="md-fab md-raised md-mini" on-tap="add($event, item)">
+						            	<ng-md-icon icon="add" size="18" />
+						          	</md-button>
+					        	</md-fab-actions>
+									</md-fab-speed-dial>
+								</div>
+							</div>
+						</div>
+						<div class="list" ng-if="item.inner" style="margin-left: 20px">
+							<div class="row" ng-repeat="item0 in item.inner">
+								<div class="col col-80">
+									<div class="ico pull-left" ng-style="{'background-position': item0.icon}"></div>
+									<strong style="position: relative; top: 8px;">{{item0.name}}</strong>
+								</div>
+								<div class="col-20">
+									<div class="col col-10 sm-fab lock-size" layout="row" layout-align="center center">
+										<md-fab-speed-dial style="margin-right: -12px; margin-top: -10px;" md-direction="left" ng-class="md-fling" class="sm-fab md-fab-top-right-static md-hover-full">
+										<md-fab-trigger>
+											<md-button aria-label="menu" class="md-fab md-warn">
+					            				<ng-md-icon icon="menu" size="24" style="fill: #ffffff" />
+							          		</md-button>
+								        </md-fab-trigger>
+								        <md-fab-actions>
+								          	<md-button aria-label="Edit" class="md-fab md-raised md-mini" on-tap="edit($event, item0)">
+								            	<ng-md-icon icon="edit" size="18" />
+								          	</md-button>
+							        	</md-fab-actions>
+							        	<md-fab-actions>
+								          	<md-button aria-label="Delete" class="md-fab md-raised md-mini" on-tap="delete($event, item0)">
+								            	<ng-md-icon icon="delete" size="18" />
+								          	</md-button>
+							        	</md-fab-actions>
+										</md-fab-speed-dial>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>				
+				</div>
+	    	</md-tab-body>
+	      </md-tab>
+	    </md-tabs>
+	    <div class="admob-banner" ng-show="$root.admobBanner">&nbsp;</div>
+	</ion-content>
+</ion-view>

@@ -1,0 +1,190 @@
+<ion-view view-title="{{$root.i18.addition.page_title}}" align-title="left">
+  <ion-content  ng-class="{expanded:isExpanded}" class="animate-fade-slide-in">
+    <md-tabs md-dynamic-height md-align-tabs="top" md-stretch-tabs ng-init="loadData()" class="md-accent">
+      <md-tab label="{{bean.type ? $root.i18.addition.utab_spending : $root.i18.addition.itab_spending}}" md-on-select="tabFocus(0)" ng-if="!bean.type || (bean.type && bean.type < 0)">
+        <md-tab-body>
+          <form id="spendingForm" name="spendingForm" class="list md-inline-form md-padding" layout="column" ng-cloak novalidate>
+            <div layout layout-md="column">
+              <md-chips class="custom-chips flex-100 effects" on-tap="focusMoneyField('spendingForm')">
+                <md-chip style="width: 100%;" class="spending">- {{bean.money ? bean.money : 0 | number: 0}} {{pref.currency}}</md-chip>
+              </md-chips>                                  
+            </div>
+            <div layout layout-md="column">
+              <md-input-container class="flex-50 effects">
+                <label>{{$root.i18.addition.label_money}}</label>
+                <input required ng-model="bean.money" name="money" type="number" select-on-click ng-disabled="bean.type" autocomplete="off" />                  
+                <div ng-messages="spendingForm.money.$error" role="alert">
+                  <div ng-message="required" >{{$root.i18.addition.error_money}}</div>
+                </div>
+              </md-input-container>
+              <md-datepicker class="flex-50 effects" ng-model="bean.createdDate" md-placeholder="{{$root.i18.addition.label_enterDate_from}}" md-max-date="today" style="padding-left: 8px" required></md-datepicker>                
+            </div>
+
+            <div layout layout-md="column">
+              <md-input-container class="flex-50 effects bg-image24">
+                <div class="sico" ng-style="{'background-position': bean.wallet.sicon}"></div>
+                <label>{{$root.i18.addition.label_wallet_from}}</label>
+                <md-select aria-label="wallet" ng-model="bean.wallet" required ng-model-options="{trackBy: '$value.ID'}" ng-disabled="bean.type">
+                  <md-option ng-repeat="w in wallet" ng-value="{{w}}" class="option-ico">
+                    <div class="ico pull-left" ng-style="{'background-position': w.icon}"></div>
+                    {{w.name}}
+                  </md-option>
+                </md-select>
+                <div class="mes">{{bean.wallet.money | number}} {{$root.pref.currency}}</div>
+              </md-input-container> 
+              <md-input-container class="flex-50 effects md-input-has-value">
+                <label style="position: relative; order: 1; top: -60px; text-align: left; width: 200px;">{{$root.i18.addition.label_is_report}}</label>
+                <md-checkbox style="margin-top: 22px;"
+                  ng-model="bean.isReport"
+                  aria-label="Is Report"
+                  ng-true-value="1"
+                  ng-false-value="0"
+                  class="md-primary">                    
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </md-checkbox>                    
+              </md-input-container>           
+            </div>
+            
+            <md-input-container class="effects bg-image24">
+              <div class="sico" ng-style="{'background-position': bean.typeSpending.sicon}"></div>
+              <label>{{$root.i18.addition.label_typeSpending}}</label>
+              <md-select  aria-label="Spending type" ng-model="bean.typeSpending" required ng-model-options="{trackBy: '$value.ID'}">
+                <md-option-group ng-repeat="ts in typeSpending">
+                  <md-option ng-value="{{ts}}" class="option-ico" ng-if="ts.type != 0 || ts.ID == bean.typeSpending">
+                    <div class="ico pull-left" ng-style="{'background-position': ts.icon}"></div>
+                    {{ts.name}}
+                  </md-option>
+                  <md-option ng-repeat="t in ts.inner" ng-if="ts.inner" ng-value="{{t}}" class="option-child option-ico">
+                    <div class="ico pull-left" ng-style="{'background-position': t.icon}"></div>
+                    {{t.name}}
+                  </md-option>
+                </md-option-group>
+              </md-select>
+            </md-input-container>
+
+            <md-input-container ng-class="{'md-input-has-value': (bean.description && bean.description.length > 0)}" class="effects">
+              <md-autocomplete md-select-on-match="true" md-floating-label="{{$root.i18.addition.label_description}}"
+                md-no-cache="true"
+                md-search-text="bean.description"
+                md-items="item in querySearch(bean.description)"
+                md-item-text="item.des">
+                <md-item-template>
+                  <span md-highlight-text="bean.description" md-highlight-flags="^i">{{item.des}}</span>
+                </md-item-template>
+              </md-autocomplete>                
+            </md-input-container>
+
+            <!-- <div layout layout-md="column" ng-if="isShowMore">
+              <md-input-container class="per-50 effect">
+                <label>{{$root.i18.addition.label_creditor}}</label>
+                <input ng-model="bean.creditor" type="text" autocomplete="off">
+              </md-input-container>
+              <md-datepicker class="per-50 effect" ng-model="bean.paymentdate" md-placeholder="{{$root.i18.addition.label_repaymentdate}}"></md-datepicker>
+            </div> -->
+
+            <div align="right">                
+              <!-- <md-switch ng-model="isShowMore" aria-label="More" class="per-50 effects">
+                {{$root.i18.addition.button_more}}
+              </md-switch>     -->            
+              <md-button class="per-50 md-primary md-raised effects" on-tap="save('spendingForm', $event)"><i class="icon ion-checkmark"></i> {{$root.i18.addition.button_save}}</md-button>
+            </div>
+            
+          </form>
+        </md-tab-body>
+      </md-tab>
+
+      <md-tab label="{{bean.type ? $root.i18.addition.utab_earning : $root.i18.addition.itab_earning}}" md-on-select="tabFocus(1)" ng-if="!bean.type || (bean.type && bean.type > 0)">
+        <md-tab-body>
+          <form id="earningForm" name="earningForm" class="list md-inline-form md-padding" layout="column" ng-cloak novalidate>
+            
+            <div layout layout-md="column">
+              <md-chips class="custom-chips flex-100 effects" on-tap="focusMoneyField('earningForm')">
+                <md-chip style="width: 100%;" class="earning">+ {{bean.money ? bean.money : 0 | number: 0}} {{pref.currency}}</md-chip>
+              </md-chips>                                  
+            </div>
+            <div layout layout-md="column">
+              <md-input-container class="flex-50 effects">
+                <label>{{$root.i18.addition.label_money}}</label>
+                <input required ng-model="bean.money" name="money" type="number" select-on-click ng-disabled="bean.type" autocomplete="off" />                  
+                <div ng-messages="earningForm.money.$error" role="alert">
+                  <div ng-message="required" >{{$root.i18.addition.error_money}}</div>
+                </div>
+              </md-input-container>
+              <md-datepicker class="flex-50 effects" ng-model="bean.createdDate" md-placeholder="{{$root.i18.addition.label_enterDate_to}}" md-max-date="today" style="padding-left: 8px" required></md-datepicker>                
+            </div>
+
+            <div layout layout-md="column">
+              <md-input-container class="flex-50 effects bg-image24">
+                <div class="sico" ng-style="{'background-position': bean.wallet.sicon}"></div>
+                <label>{{$root.i18.addition.label_wallet_to}}</label>
+                <md-select aria-label="wallet" ng-model="bean.wallet" required ng-model-options="{trackBy: '$value.ID'}" ng-disabled="bean.type">
+                  <md-option ng-repeat="w in wallet" ng-value="{{w}}" class="option-ico">
+                    <div class="ico pull-left" ng-style="{'background-position': w.icon}"></div>
+                    {{w.name}}
+                  </md-option>
+                </md-select>
+                <div class="mes">{{bean.wallet.money | number}} {{$root.pref.currency}}</div>
+              </md-input-container> 
+              <md-input-container class="flex-50 md-input-has-value effects">
+                <label style="position: relative; order: 1; top: -60px; text-align: left; width: 200px;">{{$root.i18.addition.label_is_report}}</label>
+                <md-checkbox style="margin-top: 22px;"
+                  ng-model="bean.isReport"
+                  aria-label="Is Report"
+                  ng-true-value="1"
+                  ng-false-value="0"
+                  class="md-primary">                    
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </md-checkbox>                    
+              </md-input-container>           
+            </div>
+            <md-input-container class="effects bg-image24">
+              <div class="sico" ng-style="{'background-position': bean.typeEarning.sicon}"></div>
+              <label>{{$root.i18.addition.label_typeSpending}}</label>
+              <md-select aria-label="Earning type" ng-model="bean.typeEarning" required ng-model-options="{trackBy: '$value.ID'}">
+                <md-option-group ng-repeat="ts in typeEarning">
+                  <md-option ng-value="{{ts}}" class="option-ico">
+                    <div class="ico pull-left" ng-style="{'background-position': ts.icon}"></div>
+                    {{ts.name}}
+                  </md-option>
+                  <md-option ng-repeat="t in ts.inner" ng-if="ts.inner" ng-value="{{t}}" class="option-child option-ico">
+                    <div class="ico pull-left" ng-style="{'background-position': t.icon}"></div>
+                    {{t.name}}
+                  </md-option>
+                </md-option-group>
+              </md-select>
+            </md-input-container>
+            
+            <md-input-container ng-class="{'md-input-has-value': (bean.description && bean.description.length > 0)}" class="effects">
+              <md-autocomplete md-select-on-match="true" md-floating-label="{{$root.i18.addition.label_description}}"
+                md-no-cache="true"
+                md-search-text="bean.description"
+                md-items="item in querySearch(bean.description)"
+                md-item-text="item.des">
+                <md-item-template>
+                  <span md-highlight-text="bean.description" md-highlight-flags="^i">{{item.des}}</span>
+                </md-item-template>
+              </md-autocomplete>                
+            </md-input-container>
+
+            <!-- <div layout layout-md="column" ng-if="isShowMore">
+              <md-input-container class="per-50 effects">
+                <label>{{$root.i18.addition.label_debtor}}</label>
+                <input ng-model="bean.creditor" type="text" autocomplete="off">
+              </md-input-container>
+              <md-datepicker class="per-50 effects" ng-model="bean.paymentdate" md-placeholder="{{$root.i18.addition.label_debtDate}}"></md-datepicker>
+            </div> -->
+
+            <div align="right">                
+              <!-- <md-switch ng-model="isShowMore" aria-label="More" class="per-50 effects">
+                {{$root.i18.addition.button_more}}
+              </md-switch> -->
+              <md-button class="per-50 md-primary md-raised effects" on-tap="save('earningForm', $event)"><i class="icon ion-checkmark"></i> {{$root.i18.addition.button_save}}</md-button>
+            </div>
+
+          </form>
+        </md-tab-body>
+      </md-tab>      
+    </md-tabs>
+    <div class="admob-banner" ng-init="loadEffect('effects')" ng-show="$root.admobBanner">&nbsp;</div>
+  </ion-content>
+</ion-view>
